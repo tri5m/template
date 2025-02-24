@@ -1,8 +1,7 @@
 ### springboot 2.x的大型项目脚手架
 * JDK17
-* springBoot 2.7.15
-* tkMybatis
-* Pagehelper
+* springBoot 2.7.18
+* xbatis
 * Tucache
 * SpringDoc(OpenAPI3)
 * redisson
