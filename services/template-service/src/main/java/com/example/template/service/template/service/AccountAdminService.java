@@ -3,12 +3,14 @@ package com.example.template.service.template.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.xbatis.core.sql.executor.Where;
+import cn.xbatis.core.sql.executor.chain.DeleteChain;
+import cn.xbatis.core.sql.executor.chain.QueryChain;
 import com.example.template.common.helper.BeanFiller;
 import com.example.template.common.helper.exception.InvokeException;
 import com.example.template.common.helper.exception.NotFondException;
 import com.example.template.common.helper.exception.ValidateException;
 import com.example.template.common.helper.tree.TreeBuilder;
-import com.example.template.common.response.Paging;
 import com.example.template.common.util.JsonUtil;
 import com.example.template.common.util.MD5Util;
 import com.example.template.repo.entity.Admin;
@@ -19,7 +21,6 @@ import com.example.template.repo.mapper.AdminMapper;
 import com.example.template.repo.mapper.AdminRoleMapper;
 import com.example.template.repo.mapper.AuthRoleIdxMapper;
 import com.example.template.repo.mapper.AuthorizationMapper;
-import com.example.template.repo.util.QueryHelper;
 import com.example.template.service.template.model.ro.account.SaveAdminRo;
 import com.example.template.service.template.model.ro.account.SaveRoleRo;
 import com.example.template.service.template.model.vo.AdminBaseVo;
@@ -30,12 +31,13 @@ import com.example.template.service.template.model.vo.account.RoleListVo;
 import com.example.template.services.common.context.UserContext;
 import com.example.template.services.common.model.ro.SearchRo;
 import com.example.template.services.common.model.vo.BaseVo;
+import com.example.template.services.common.response.Paging;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -67,10 +69,13 @@ public class AccountAdminService {
     private AuthorizationMapper authorizationMapper;
 
     public Paging<RoleListVo> roles(SearchRo ro) {
-
-        QueryHelper.setupPageCondition(ro);
-        return QueryHelper.getPaging(adminRoleMapper.search(ro.getKeyword()),
-                RoleListVo.class, (vo, db) -> vo.setCreateUser(new AdminBaseVo(adminContext.getAdmin(db.getCreateBy()))));
+        return Paging.of(QueryChain.of(adminRoleMapper)
+                .forSearch().or()
+                .like(AdminRole::getCode, ro.getKeyword())
+                .like(AdminRole::getName, ro.getKeyword())
+                .returnType(RoleListVo.class, (vo)
+                        -> vo.setCreateUser(new AdminBaseVo(adminContext.getAdmin(vo.getCreateBy()))))
+                .paging(ro.getPager()));
     }
 
     public void saveRole(SaveRoleRo ro) {
@@ -81,37 +86,39 @@ public class AccountAdminService {
             roleCode = ro.getCode();
             role = BeanFiller.target(AdminRole.class).accept(ro);
             role.setCreateBy(adminId);
-            role.setCreateTime(new Date());
+            role.setCreateTime(LocalDateTime.now());
             role.setIsBanned(Boolean.FALSE);
             role.setIsDel(Boolean.FALSE);
             role.setIsSysRole(Boolean.FALSE);
 
-            if (CollUtil.isNotEmpty(adminRoleMapper.findByNameOrCode(ro.getName(), ro.getCode()))) {
+            if (CollUtil.isNotEmpty(adminRoleMapper.
+                    findByNameOrCode(ro.getName(), ro.getCode()))) {
                 throw new ValidateException("名称或code已经存在!");
             }
 
-            adminRoleMapper.insert(role);
+            adminRoleMapper.save(role);
         } else {
-            role = adminRoleMapper.selectByPrimaryKey(ro.getId());
+            role = adminRoleMapper.getById(ro.getId());
             if (role == null) {
                 throw new NotFondException("角色不存在");
             }
             role.setName(ro.getName());
             role.setDescription(ro.getDescription());
             List<AdminRole> byName = adminRoleMapper.findByNameOrCode(ro.getName(), role.getCode());
-            if (CollUtil.isNotEmpty(byName) && byName.stream().anyMatch(n -> !n.getId().equals(ro.getId()))) {
+            if (CollUtil.isNotEmpty(byName) && byName.stream()
+                    .anyMatch(n -> !n.getId().equals(ro.getId()))) {
                 throw new ValidateException("名称已经存在!");
             }
 
-            adminRoleMapper.updateByPrimaryKey(role);
+            adminRoleMapper.update(role);
             roleCode = role.getCode();
         }
-        authRoleIdxMapper.delByRoleCode(role.getCode());
+        DeleteChain.of(authRoleIdxMapper).eq(AuthRoleIdx::getRoleCode, roleCode).execute();
         if (CollUtil.isNotEmpty(ro.getAuths())) {
-            authRoleIdxMapper.insertList(ro.getAuths().stream().map(auth -> {
+            authRoleIdxMapper.saveBatch(ro.getAuths().stream().map(auth -> {
                 AuthRoleIdx idx = new AuthRoleIdx();
                 idx.setCreateBy(adminId);
-                idx.setCreateTime(new Date());
+                idx.setCreateTime(LocalDateTime.now());
                 idx.setRoleCode(roleCode);
                 idx.setAuthCode(auth);
                 return idx;
@@ -130,7 +137,7 @@ public class AccountAdminService {
         }
 
         role.setIsBanned(!Boolean.TRUE.equals(role.getIsBanned()));
-        adminRoleMapper.updateByPrimaryKey(role);
+        adminRoleMapper.update(role);
     }
 
     public void deleteRole(String code) {
@@ -144,12 +151,12 @@ public class AccountAdminService {
         }
 
         adminMapper.delAdminOneRole(code);
-        adminRoleMapper.deleteByPrimaryKey(role.getId());
-        authRoleIdxMapper.delByRoleCode(code);
+        adminRoleMapper.deleteById(role.getId());
+        authRoleIdxMapper.delete(Where.create().eq(AuthRoleIdx::getRoleCode, code));
     }
 
     public List<AuthTreeVo> getAuthTree() {
-        List<Authorization> auths = authorizationMapper.selectAll();
+        List<Authorization> auths = authorizationMapper.listAll();
         return TreeBuilder.build(auths.stream().map(a -> {
             AuthTreeVo vo = new AuthTreeVo();
             vo.setId(a.getCode());
@@ -163,19 +170,20 @@ public class AccountAdminService {
 
     public Paging<AdminListVo> adminList(SearchRo ro) {
 
-        List<AdminRole> roles = adminRoleMapper.selectAll();
-        QueryHelper.setupPageCondition(ro);
-        return QueryHelper.getPaging(adminMapper.searchUser(ro.getKeyword()),
-                AdminListVo.class, (vo, admin) -> vo.setRoleNames(roles.stream().filter(
-                        r -> CollUtil.contains(JsonUtil.jsonToList(admin.getRoleCodes(), String.class),
-                                r.getCode())).map(AdminRole::getName).collect(Collectors.toList())
-
-                ));
+        List<AdminRole> roles = adminRoleMapper.listAll();
+        return Paging.of(QueryChain.of(adminMapper)
+                .forSearch().or()
+                .like(Admin::getName, ro.getKeyword())
+                .like(Admin::getUserName, ro.getKeyword())
+                .returnType(AdminListVo.class, (vo) -> vo.setRoleNames(roles.stream().filter(
+                        r -> CollUtil.contains(JsonUtil.jsonToList(vo.getRoleCodes(), String.class),
+                                r.getCode())).map(AdminRole::getName).collect(Collectors.toList())))
+                .paging(ro.getPager()));
     }
 
     public AdminDetailVo adminDetail(Long id) {
 
-        var admin = adminMapper.selectByPrimaryKey(id);
+        var admin = adminMapper.getById(id);
         if (admin == null) {
             throw new NotFondException("用户不存在!");
         }
@@ -183,7 +191,7 @@ public class AccountAdminService {
         var vo = BeanFiller.target(AdminDetailVo.class).accept(admin);
         List<String> roleCodes = JsonUtil.jsonToList(admin.getRoleCodes(), String.class);
         if (roleCodes != null) {
-            List<AdminRole> allRoles = adminRoleMapper.selectAll();
+            List<AdminRole> allRoles = adminRoleMapper.listAll();
             vo.setRoles(allRoles.stream().filter(
                     r -> CollUtil.contains(JsonUtil.jsonToList(admin.getRoleCodes(), String.class),
                             r.getCode())).map(r -> new BaseVo(r.getCode(), r.getName())).collect(Collectors.toList())
@@ -207,7 +215,7 @@ public class AccountAdminService {
             newAdmin.setUserName(ro.getUserName());
             newAdmin.setRoleCodes(JsonUtil.toJson(ro.getRoles()));
             newAdmin.setCreateBy(adminContext.getAdminIdIfDefault(null));
-            newAdmin.setCreateTime(new Date());
+            newAdmin.setCreateTime(LocalDateTime.now());
             newAdmin.setIsBanned(Boolean.FALSE);
             newAdmin.setIsDel(Boolean.FALSE);
             newAdmin.setIsSuper(Boolean.FALSE);
@@ -216,10 +224,10 @@ public class AccountAdminService {
             } else {
                 newAdmin.setPassword(RandomUtil.randomString(32));
             }
-            adminMapper.insert(newAdmin);
+            adminMapper.save(newAdmin);
 
         } else {
-            var oldAdmin = adminMapper.selectByPrimaryKey(ro.getId());
+            var oldAdmin = adminMapper.getById(ro.getId());
             if (oldAdmin == null) {
                 throw new NotFondException("用户不存在!");
             }
@@ -235,16 +243,16 @@ public class AccountAdminService {
             newAdmin.setUserName(ro.getUserName());
             newAdmin.setRoleCodes(JsonUtil.toJson(ro.getRoles()));
             newAdmin.setUpdateBy(adminContext.getAdminIdIfDefault(null));
-            newAdmin.setUpdateTime(new Date());
+            newAdmin.setUpdateTime(LocalDateTime.now());
             if (StrUtil.isNotBlank(ro.getPassword())) {
                 newAdmin.setPassword(MD5Util.getMD5String(ro.getPassword()));
             }
-            adminMapper.updateByPrimaryKeySelective(newAdmin);
+            adminMapper.update(newAdmin);
         }
     }
 
-    public void deleteAdmin(Long id){
-        var admin = adminMapper.selectByPrimaryKey(id);
+    public void deleteAdmin(Long id) {
+        var admin = adminMapper.getById(id);
         if (admin == null) {
             throw new NotFondException("用户不存在!");
         }
@@ -252,12 +260,12 @@ public class AccountAdminService {
             throw new InvokeException("超级管理员无法删除!");
         }
 
-        adminMapper.deleteByPrimaryKey(id);
+        adminMapper.deleteById(id);
     }
 
     public void disEnAbleAdmin(Long id) {
 
-        var admin = adminMapper.selectByPrimaryKey(id);
+        var admin = adminMapper.getById(id);
         if (admin == null) {
             throw new NotFondException("用户不存在!");
         }
@@ -265,7 +273,7 @@ public class AccountAdminService {
             throw new InvokeException("超级管理员无法禁用!");
         }
         admin.setIsBanned(!Boolean.TRUE.equals(admin.getIsBanned()));
-        adminMapper.updateByPrimaryKey(admin);
+        adminMapper.update(admin);
     }
 
 }

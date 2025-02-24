@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.template.repo.mapper.AuthRoleIdxMapper">
+
+    <resultMap id="ResultMap" type="com.example.template.repo.entity.AuthRoleIdx">
+        <!--@Table t_auth_role_idx -->
+        <id column="id" property="id" />
+        <result column="role_code" property="roleCode" />
+        <result column="auth_code" property="authCode" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="ColumnList">
+        <!--@sql select -->
+        id
+        ,role_code
+        ,auth_code
+        ,create_by
+        ,create_time
+        <!--@sql from  t_auth_role_idx-->
+    </sql>
+</mapper>

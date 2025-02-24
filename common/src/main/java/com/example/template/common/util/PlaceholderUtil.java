@@ -11,10 +11,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @title: PlaceholderUtil
- * @author: wangxudong
- * @date: 2022/6/28
- * @modified :
+ * @title: 模板工具，提交字符串模板
+ * @author: trifolium.wang
+ * @date: 2024/9/24
  */
 public class PlaceholderUtil {
 

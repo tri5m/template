@@ -1,10 +1,10 @@
 package com.example.template.service.template.controller;
 
-import com.example.template.common.response.Paging;
-import com.example.template.common.response.ResponseResult;
 import com.example.template.service.template.model.vo.AdminBaseVo;
 import com.example.template.service.template.service.TestService;
 import com.example.template.services.common.model.ro.SearchRo;
+import com.example.template.services.common.response.Paging;
+import com.example.template.services.common.response.ResponseResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;

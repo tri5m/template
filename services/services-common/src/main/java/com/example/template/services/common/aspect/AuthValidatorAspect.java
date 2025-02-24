@@ -10,7 +10,7 @@ import com.example.template.repo.entity.Admin;
 import com.example.template.repo.entity.Authorization;
 import com.example.template.services.common.annotion.AuthValidator;
 import com.example.template.services.common.cache.RedisCacheService;
-import com.example.template.services.common.holder.SessionHolder;
+import com.example.template.services.common.holder.RequestHolder;
 import com.example.template.services.common.model.enumeration.AuthorizationType;
 import com.example.template.services.common.model.enumeration.Const;
 import lombok.extern.slf4j.Slf4j;
@@ -85,7 +85,7 @@ public class AuthValidatorAspect {
             return;
         }
 
-        HttpServletRequest request = SessionHolder.getRequest();
+        HttpServletRequest request = RequestHolder.getRequest();
         if (request == null) {
             throw new InvokeException("无法获取请求对象");
         }

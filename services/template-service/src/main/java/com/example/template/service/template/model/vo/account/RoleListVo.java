@@ -1,6 +1,7 @@
 package com.example.template.service.template.model.vo.account;
 
 import com.example.template.service.template.model.vo.AdminBaseVo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -25,6 +26,9 @@ public class RoleListVo {
 
     @Schema(description = "是否被禁用")
     private Boolean isBanned;
+
+    @JsonIgnore
+    private Long createBy;
 
     @Schema(description = "创建人")
     private AdminBaseVo createUser;

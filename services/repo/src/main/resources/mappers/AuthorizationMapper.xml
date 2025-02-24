@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.template.repo.mapper.AuthorizationMapper">
+
+    <resultMap id="ResultMap" type="com.example.template.repo.entity.Authorization">
+        <!--@Table t_authorization -->
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="description" property="description" />
+        <result column="authority" property="authority" />
+        <result column="type" property="type" />
+        <result column="parent_code" property="parentCode" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="is_del" property="isDel" />
+    </resultMap>
+
+    <sql id="ColumnList">
+        <!--@sql select -->
+        id
+        ,code
+        ,name
+        ,description
+        ,authority
+        ,type
+        ,parent_code
+        ,create_by
+        ,create_time
+        ,is_del
+        <!--@sql from  t_authorization-->
+    </sql>
+
+    <sql id="Named_Column_List">
+        <!--@sql SELECT -->
+        da.id, da.code, da.`name`, da.description, da.authority, da.`type`, da.parent_code, da.create_by,
+        da.create_time,
+        da.is_del
+        <!--@sql FROM t_authorization da -->
+    </sql>
+
+    <select id="findAuthorizationByRoleCode" resultMap="ResultMap">
+        SELECT
+        <include refid="Named_Column_List"/>
+        FROM t_authorization AS da,
+        t_auth_role_idx AS dari
+        <where>
+            da.code = dari.auth_code
+            AND
+            da.is_del = 0
+            AND
+            dari.role_code = #{roleCode}
+        </where>
+    </select>
+</mapper>

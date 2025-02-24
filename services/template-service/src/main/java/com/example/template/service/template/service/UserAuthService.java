@@ -20,7 +20,7 @@ import com.example.template.service.template.model.vo.auth.LoginVo;
 import com.example.template.services.common.cache.RedisCacheService;
 import com.example.template.services.common.configuration.AppConfig;
 import com.example.template.services.common.context.UserContext;
-import com.example.template.services.common.holder.SessionHolder;
+import com.example.template.services.common.holder.RequestHolder;
 import com.example.template.services.common.model.enumeration.AuthorizationType;
 import com.example.template.services.common.model.enumeration.Const;
 import org.redisson.api.RateIntervalUnit;
@@ -131,12 +131,12 @@ public class UserAuthService {
      * 输出验证码
      */
     public void captchaImage(HttpServletResponse response) throws IOException {
-        var session = SessionHolder.getSession();
+        var session = RequestHolder.getSession();
         if (session == null) {
             throw new RuntimeException("请求错误");
         }
         var sessionId = session.getId();
-        var ip = SessionHolder.getRemoteIp();
+        var ip = RequestHolder.getRemoteIp();
         // 通过ip简单限制刷验证码
         var rateLimiter = redissonClient.getRateLimiter("rate_limiter:get_captcha_image:" + ip);
         rateLimiter.trySetRate(RateType.OVERALL, 60, 3, RateIntervalUnit.MINUTES);
@@ -163,7 +163,7 @@ public class UserAuthService {
      */
     private void checkCaptcha(String captcha) {
         // 验证图片验证码
-        var request = SessionHolder.getRequest();
+        var request = RequestHolder.getRequest();
         if (request == null) {
             throw new RuntimeException("请求错误");
         }
@@ -177,7 +177,7 @@ public class UserAuthService {
         if (StrUtil.isEmpty(sessionId)) {
             sessionId = request.getHeader(Const.CAPTCHA_SESSION_NAME);
             if (StrUtil.isEmpty(sessionId)) {
-                var session = SessionHolder.getSession();
+                var session = RequestHolder.getSession();
                 sessionId = session == null ? null : ((String) session.getAttribute(Const.CAPTCHA_SESSION_NAME));
             }
         }
@@ -197,7 +197,7 @@ public class UserAuthService {
     public void editPwd(EditPwdRo ro) {
         var admin = adminContext.getAdmin();
 
-        var adminDb = adminMapper.selectByPrimaryKey(admin.getId());
+        var adminDb = adminMapper.getById(admin.getId());
 
         if (adminDb == null || !StrUtil.equalsIgnoreCase(MD5Util.getMD5String(ro.getOldPwd()), adminDb.getPassword())) {
             throw new InvokeException("原密码错误");
@@ -205,7 +205,7 @@ public class UserAuthService {
 
         adminDb.setPassword(MD5Util.getMD5String(ro.getNewPwd()));
 
-        adminMapper.updateByPrimaryKey(adminDb);
+        adminMapper.update(adminDb);
     }
 
     /**

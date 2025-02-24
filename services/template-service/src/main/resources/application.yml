@@ -1,6 +1,6 @@
 server:
   servlet:
-    context-path: /template
+    context-path: /api
     application-display-name: template脚手架项目
   port: 8083
   error:
@@ -37,11 +37,12 @@ spring:
 
 mybatis:
   mapper-locations: classpath*:mapper/*.xml
-  type-aliases-package: '@project.groupId@.repo.entity'
   configuration.map-underscore-to-camel-case: true
   configuration:
-    cache-enabled: true
+    databaseId: MYSQL
+    cache-enabled: false
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    ## log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
 
 application-description: '@project.description@'
 application-version: '@project.version@'
@@ -60,16 +61,6 @@ springdoc:
 knife4j:
   enable: true
   production: false
-
-mapper:
-  safe-update: true
-  safe-delete: true
-
-pagehelper:
-  helperDialect: mysql
-  reasonable: false
-  supportMethodsArguments: true
-  params: count=countSql
 
 logging:
   config: classpath:logback-spring.xml

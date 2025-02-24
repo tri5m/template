@@ -15,8 +15,8 @@ import java.util.Random;
  * Title:验证码生成
  * Description: 生成类似QQ验证码的类
  *
- * @author trifolium
- * @version 1.0
+ * @author: trifolium.wang
+ * @date: 2024/9/24
  */
 public class ImageVerCodeUtil {
 

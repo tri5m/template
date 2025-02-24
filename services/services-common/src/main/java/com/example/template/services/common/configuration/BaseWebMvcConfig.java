@@ -4,12 +4,13 @@ import cn.hutool.core.collection.CollUtil;
 import com.example.template.common.helper.exception.AppBaseException;
 import com.example.template.common.helper.exception.NoAuthException;
 import com.example.template.common.helper.exception.TokenInvalidException;
-import com.example.template.common.response.ResponseResult;
-import com.example.template.common.response.ResultCode;
+import com.example.template.services.common.response.ResponseResult;
+import com.example.template.services.common.response.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
@@ -62,6 +63,15 @@ public class BaseWebMvcConfig implements WebMvcConfigurer {
             return new ResponseEntity<>(ResponseResult.failure(message), HttpStatus.OK);
         }
 
+        // 非法请求的异常，精简日志的打印。
+        message = illegalRequestException(exception);
+
+        if (message != null) {
+            log.warn(message);
+            return new ResponseEntity<>(ResponseResult.error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         log.error("result_code: {}, msg: {}", exception.getMessage(), ResultCode.EXCEPTION, exception);
 
         return new ResponseEntity<>(ResponseResult.error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()),
@@ -70,6 +80,8 @@ public class BaseWebMvcConfig implements WebMvcConfigurer {
 
     private String validateExceptionProcess(Exception exception) {
         String message = null;
+
+        // 验证参数错误
         if (exception instanceof MethodArgumentNotValidException ex) {
             List<ObjectError> errors = ex.getBindingResult().getAllErrors();
 
@@ -80,6 +92,7 @@ public class BaseWebMvcConfig implements WebMvcConfigurer {
             return message;
         }
 
+        // 验证参数错误
         if (exception instanceof BindException bindE) {
             List<ObjectError> errors = bindE.getAllErrors();
 
@@ -91,14 +104,25 @@ public class BaseWebMvcConfig implements WebMvcConfigurer {
             return message;
         }
 
+        // 参数异常
         if (exception instanceof ConstraintViolationException conVE) {
 
             return CollUtil.join(conVE.getConstraintViolations().stream()
                     .map(ConstraintViolation::getMessage).collect(Collectors.toList()), ",");
         }
 
+        // 请求的参数确实
         if (exception instanceof MissingServletRequestParameterException msrpe) {
             return "parameters are missing:" + msrpe.getParameterName();
+        }
+
+        return null;
+    }
+
+    private String illegalRequestException(Exception exception){
+        // 请求的非法json
+        if(exception instanceof HttpMessageNotReadableException mie){
+            return mie.getMessage();
         }
 
         return null;

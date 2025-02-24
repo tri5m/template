@@ -9,8 +9,9 @@ import java.util.Map;
 
 /**
  * @title: Spring上下文
+ *
  * @author: trifolium.wang
- * @date: 2024/7/12
+ * @date: 2024/9/24
  */
 @Component
 public class SpringContextHolder implements ApplicationContextAware {

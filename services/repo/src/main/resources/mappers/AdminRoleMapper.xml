@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.template.repo.mapper.AdminRoleMapper">
+
+    <resultMap id="ResultMap" type="com.example.template.repo.entity.AdminRole">
+        <!--@Table t_admin_role -->
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="type" property="type" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="is_banned" property="isBanned" />
+        <result column="is_sys_role" property="isSysRole" />
+        <result column="is_del" property="isDel" />
+        <result column="description" property="description" />
+    </resultMap>
+
+    <sql id="ColumnList">
+        <!--@sql select -->
+        id
+        ,code
+        ,name
+        ,type
+        ,create_by
+        ,create_time
+        ,is_banned
+        ,is_sys_role
+        ,is_del
+        ,description
+        <!--@sql from  t_admin_role-->
+    </sql>
+</mapper>

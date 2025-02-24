@@ -12,7 +12,6 @@
     <description>template 大型项目脚手架项目</description>
 
     <modules>
-        <module>repo</module>
         <module>common</module>
         <module>services</module>
     </modules>

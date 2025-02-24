@@ -1,0 +1,61 @@
+<mp-generator>
+
+    <author>trifolium</author>
+    <fileCover>true</fileCover>
+
+    <dataSource>
+        <username>root</username>
+        <password>123456</password>
+        <jdbcUrl>jdbc:mysql://127.0.0.1:3306/template</jdbcUrl>
+    </dataSource>
+
+    <!-- 按照官方文档配置各对象 -->
+    <tableConfig>
+        <tablePrefixes>
+            <string>t_</string>
+        </tablePrefixes>
+        <includeTables>
+            <string>t_admin</string>
+            <string>t_admin_role</string>
+            <string>t_auth_role_idx</string>
+            <string>t_authorization</string>
+        </includeTables>
+    </tableConfig>
+
+    <basePackage>com.example.template.repo.bo</basePackage>
+
+    <entityConfig>
+        <packageName>entity</packageName>
+        <swagger>false</swagger>
+        <lombok>true</lombok>
+    </entityConfig>
+
+    <mapperConfig>
+        <packageName>mapper</packageName>
+        <mapperAnnotation>false</mapperAnnotation>
+    </mapperConfig>
+
+    <mapperXmlConfig>
+        <enable>true</enable>
+        <packageName>mappers</packageName>
+        <resultMap>true</resultMap>
+        <columnList>true</columnList>
+        <suffix>Mapper</suffix>
+    </mapperXmlConfig>
+
+    <daoConfig>
+        <enable>false</enable>
+    </daoConfig>
+    <daoImplConfig>
+        <enable>false</enable>
+    </daoImplConfig>
+    <serviceConfig>
+        <enable>false</enable>
+    </serviceConfig>
+    <serviceImplConfig>
+        <enable>false</enable>
+    </serviceImplConfig>
+    <actionConfig>
+        <enable>false</enable>
+    </actionConfig>
+</mp-generator>

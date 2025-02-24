@@ -16,13 +16,16 @@ import java.util.Random;
 
 /**
  * MD5hash签名工具类
+ *
+ * @author: trifolium.wang
+ * @date: 2024/9/24
  */
 public class MD5Util {
 
     private static final Logger log = LoggerFactory.getLogger(MD5Util.class);
 
     /**
-     * 获取32位MD5签名字符串
+     * 获取32位MD5签名Hex字符串
      */
     public static String getMD5String(byte[] bytes) {
         try {
@@ -36,7 +39,7 @@ public class MD5Util {
     }
 
     /**
-     * 获取32位MD5摘要
+     * 获取32位MD5摘要Hex字符串
      */
     public static String getMD5String(String str) {
         try {
@@ -50,7 +53,7 @@ public class MD5Util {
     }
 
     /**
-     * 获取16位MD5签名字符串
+     * 获取16位MD5签名Hex字符串
      */
     public static String get16MD5String(String str) {
         String md516 = null;
@@ -70,7 +73,7 @@ public class MD5Util {
     }
 
     /**
-     * 获取32位MD5签名字符串
+     * 获取32位MD5签名Hex字符串
      */
     public static String getMD5String(File file) throws Exception {
         MessageDigest messagedigest = getMessageDigest();

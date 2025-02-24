@@ -28,5 +28,7 @@ public class AdminListVo extends AdminBaseVo {
     @Schema(description = "角色名列表")
     private List<String> roleNames;
 
+    private String roleCodes;
+
     private String remark;
 }

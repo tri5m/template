@@ -54,8 +54,8 @@
         <profile>
             <id>docker</id>
             <properties>
-                <redis.ip>docker.for.mac.host.internal</redis.ip>
-                <mysql.ip>docker.for.mac.host.internal</mysql.ip>
+                <redis.ip>host.docker.internal</redis.ip>
+                <mysql.ip>host.docker.internal</mysql.ip>
             </properties>
         </profile>
     </profiles>

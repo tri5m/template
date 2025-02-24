@@ -13,10 +13,9 @@ import java.util.Date;
 
 /**
  * Title:日期工具类
- * Created time: 2016-9-2 下午2:52:11
  *
- * @author trifolium
- * @version 1.0
+ * @author: trifolium.wang
+ * @date: 2024/9/24
  */
 public class DateUtil {
     private static final Logger log = LoggerFactory.getLogger(DateUtil.class);
@@ -124,8 +123,7 @@ public class DateUtil {
      * @return 系统日期时间yyyy-MM-dd hh:mm:ss
      */
     public static String getDatetimeStr() {
-        DateFormat format = new SimpleDateFormat(YMD_HMS);
-        return format.format(new Date());
+        return getDatetimeStr(YMD_HMS);
     }
 
     /**
@@ -191,7 +189,6 @@ public class DateUtil {
 
     /**
      * 获取年龄精确到天
-     *
      */
     public static String ageDayString(Date startDate) {
         if (startDate != null) {

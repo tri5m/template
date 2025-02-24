@@ -18,15 +18,17 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class AESUtil {
 
-    private static final String DEFAULT_OFFSET = "MI1CdwIBadANB359";
+    // 默认向量
+    private static final byte[] DEFAULT_OFFSET = new byte[]
+            { 77, 73, 49, 67, 100, 119, 73, 66, 97, 100, 65, 78, 66, 51, 53, 57 };
 
     // 偏移量
-    private final static ThreadLocal<String> OFFSET = new ThreadLocal<>();
+    private final static ThreadLocal<byte[]> OFFSET = new ThreadLocal<>();
 
     private AESUtil() {
     }
 
-    public static void setOffset(String offset) {
+    public static void setOffset(byte[] offset) {
         OFFSET.set(offset);
     }
 
@@ -42,7 +44,7 @@ public class AESUtil {
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
-            IvParameterSpec iv = new IvParameterSpec(getOffset().getBytes(StandardCharsets.UTF_8));
+            IvParameterSpec iv = new IvParameterSpec(getOffset());
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, iv);
             byte[] encrypted = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
 
@@ -69,7 +71,7 @@ public class AESUtil {
             byte[] encrypted1 = Base64Decoder.decode(data);
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
-            IvParameterSpec iv = new IvParameterSpec(getOffset().getBytes(StandardCharsets.UTF_8));
+            IvParameterSpec iv = new IvParameterSpec(getOffset());
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, iv);
             byte[] original = cipher.doFinal(encrypted1);
 
@@ -80,8 +82,8 @@ public class AESUtil {
         }
     }
 
-    private static String getOffset() {
-        String offSet = OFFSET.get();
+    private static byte[] getOffset() {
+        byte[] offSet = OFFSET.get();
         return offSet == null ? DEFAULT_OFFSET : offSet;
     }
 }

@@ -1,7 +1,5 @@
 package com.example.template.service.template.controller;
 
-import com.example.template.common.response.Paging;
-import com.example.template.common.response.ResponseResult;
 import com.example.template.service.template.model.ro.account.SaveAdminRo;
 import com.example.template.service.template.model.ro.account.SaveRoleRo;
 import com.example.template.service.template.model.vo.account.AdminDetailVo;
@@ -11,6 +9,8 @@ import com.example.template.service.template.model.vo.account.RoleListVo;
 import com.example.template.service.template.service.AccountAdminService;
 import com.example.template.services.common.annotion.AuthValidator;
 import com.example.template.services.common.model.ro.SearchRo;
+import com.example.template.services.common.response.Paging;
+import com.example.template.services.common.response.ResponseResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;

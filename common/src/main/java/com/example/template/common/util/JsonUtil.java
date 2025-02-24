@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 /**
  * Title:Json工具类
  *
- * @author trifolium
- * @version 1.0
+ * @author: trifolium.wang
+ * @date: 2024/9/24
  */
 public class JsonUtil {
     private static final Logger log = LoggerFactory.getLogger(JsonUtil.class);
@@ -36,7 +36,6 @@ public class JsonUtil {
 
     /**
      * 将json字符串转化为对象
-     *
      */
     public static <T> T fromJson(String json, Class<T> clazz) {
         if (StrUtil.isBlank(json)) {
@@ -47,7 +46,6 @@ public class JsonUtil {
 
     /**
      * 将json字符串转化为对象
-     *
      */
     public static <T> T fromJson(String json, TypeReference<T> typeReference) {
         if (StrUtil.isBlank(json)) {
@@ -58,7 +56,6 @@ public class JsonUtil {
 
     /**
      * 将Json字符转换为List
-     *
      */
     public static <T> List<T> jsonToList(String json, Class<T> clazz) {
         if (StrUtil.isBlank(json)) {
@@ -69,7 +66,6 @@ public class JsonUtil {
 
     /**
      * 将 json 转化为JSONObject
-     *
      */
     public static JSONObject jsonToJsonObject(String json) {
         if (StrUtil.isBlank(json)) {
@@ -136,7 +132,6 @@ public class JsonUtil {
 
     /**
      * 将json数组转成List<Map<String,Object>
-     *
      */
     public static List<Map<String, Object>> jsonToListOfObjectMap(String json) {
         List<Object> lists = jsonToList(json, Object.class);
@@ -148,7 +143,6 @@ public class JsonUtil {
 
     /**
      * 将json数组转成List<Map<String,String>
-     *
      */
     public static List<Map<String, String>> jsonToListOfStrMap(String json) {
         List<Object> lists = jsonToList(json, Object.class);
@@ -160,7 +154,6 @@ public class JsonUtil {
 
     /**
      * clone 对象浅克隆
-     *
      */
     @SuppressWarnings("unchecked")
     public static <T> T clone(T t) {

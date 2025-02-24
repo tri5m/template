@@ -6,7 +6,7 @@ import com.example.template.repo.entity.Admin;
 import com.example.template.repo.entity.Authorization;
 import com.example.template.repo.mapper.AdminMapper;
 import com.example.template.services.common.cache.RedisCacheService;
-import com.example.template.services.common.holder.SessionHolder;
+import com.example.template.services.common.holder.RequestHolder;
 import com.example.template.services.common.model.enumeration.Const;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -42,7 +42,7 @@ public class UserContext {
      * 获取当前请求管理员
      */
     public Admin getAdmin() {
-        HttpServletRequest request = SessionHolder.getRequest();
+        HttpServletRequest request = RequestHolder.getRequest();
         if (request == null) {
 
             return null;
@@ -74,7 +74,7 @@ public class UserContext {
             if (admin != null) {
                 return admin;
             }
-            Admin db = adminMapper.selectByPrimaryKey(id);
+            Admin db = adminMapper.getById(id);
             if (db != null) {
                 cacheService.set("user_info:" + id, db, 1, TimeUnit.HOURS);
             }

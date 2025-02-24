@@ -16,13 +16,15 @@
     <modules>
         <module>services-common</module>
         <module>template-service</module>
+        <module>repo</module>
     </modules>
 
     <properties>
         <spring.boot.version>2.7.18</spring.boot.version>
         <redisson.version>3.23.2</redisson.version>
         <tucache.version>1.0.3.RELEASE</tucache.version>
-        <knife4j.version>4.4.0</knife4j.version>
+        <knife4j.version>4.5.0</knife4j.version>
+        <xbatis.version>1.8.2</xbatis.version>
     </properties>
 
     <dependencyManagement>
@@ -57,6 +59,12 @@
                 <groupId>co.tunan.tucache</groupId>
                 <artifactId>tucache-spring-boot-starter</artifactId>
                 <version>${tucache.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.xbatis</groupId>
+                <artifactId>xbatis-spring-boot-starter</artifactId>
+                <version>${xbatis.version}</version>
             </dependency>
 
             <dependency>

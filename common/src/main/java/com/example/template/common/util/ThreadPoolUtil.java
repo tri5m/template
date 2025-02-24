@@ -7,12 +7,13 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Title: 自定义的动态线程池，
+ * Title: 自定义的动态线程池
+ * <p></p>
  * 线程数量动态调节，但是依然保持在 MIN_THREAD_NUM - MAX_THREAD_NUM之间，无界队列。
  * 策略： 当前队列积任务数量大于最大线程数，则启动新线程(前提是活动线程数小于最大线程数)
  *
- * @author trifolium
- * @version 1.0
+ * @author: trifolium.wang
+ * @date: 2024/9/24
  */
 @Slf4j
 public class ThreadPoolUtil {
@@ -20,8 +21,10 @@ public class ThreadPoolUtil {
     // 任务队列长度
     private static final int MAX_QUEUE_SIZE = Integer.MAX_VALUE;
 
+
     // 最小保证2个线程活跃
     private static final int CORE_THREAD_NUM = Math.max(Runtime.getRuntime().availableProcessors(), 2);
+
     // 最大为100个线程
     private static final int MAX_THREAD_NUM = Math.min(CORE_THREAD_NUM * 12, 100);
 
@@ -44,7 +47,7 @@ public class ThreadPoolUtil {
                 });
     }
 
-    public static void addThread(Runnable runnable) {
+    public static void execute(Runnable runnable) {
         THREAD_POOL.execute(runnable);
     }
 
@@ -116,7 +119,7 @@ public class ThreadPoolUtil {
         }
     }
 
-    private static void safeCheck(ThreadGroup threadGroup){
+    private static void safeCheck(ThreadGroup threadGroup) {
         if (THREAD_POOL_GROUP_NAME.equals(threadGroup.getName())) {
             log.warn("Don't submit Future tasks and get results in the current thread’s thread pool," +
                     " as it may cause deadlock.");

@@ -1,11 +1,11 @@
 package com.example.template.service.template.controller;
 
-import com.example.template.common.response.ResponseResult;
 import com.example.template.service.template.model.ro.AdminLoginRo;
 import com.example.template.service.template.model.ro.EditPwdRo;
 import com.example.template.service.template.model.vo.auth.LoginVo;
 import com.example.template.service.template.service.UserAuthService;
 import com.example.template.services.common.annotion.AuthValidator;
+import com.example.template.services.common.response.ResponseResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
