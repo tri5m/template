@@ -1,4 +1,4 @@
-package com.example.template.services.common.response;
+package com.example.template.services.common.common.response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

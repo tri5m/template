@@ -1,4 +1,4 @@
-package com.example.template.services.common.response;
+package com.example.template.services.common.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;

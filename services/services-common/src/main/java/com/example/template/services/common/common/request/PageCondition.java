@@ -1,4 +1,4 @@
-package com.example.template.services.common.request;
+package com.example.template.services.common.common.request;
 
 import cn.xbatis.core.mybatis.mapper.context.Pager;
 import com.alibaba.fastjson2.annotation.JSONField;

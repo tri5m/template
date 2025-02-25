@@ -61,6 +61,14 @@ springdoc:
 knife4j:
   enable: true
   production: false
+  setting:
+    enableOpenApi: true
+    enableSwaggerModels: true
+    enableFooter: false
+  basic:
+    enable: false
+    username: doc
+    password: doc
 
 logging:
   config: classpath:logback-spring.xml

@@ -4,8 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import com.example.template.common.helper.exception.AppBaseException;
 import com.example.template.common.helper.exception.NoAuthException;
 import com.example.template.common.helper.exception.TokenInvalidException;
-import com.example.template.services.common.response.ResponseResult;
-import com.example.template.services.common.response.ResultCode;
+import com.example.template.services.common.common.response.ResponseResult;
+import com.example.template.services.common.common.response.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -17,9 +17,12 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
@@ -119,13 +122,34 @@ public class BaseWebMvcConfig implements WebMvcConfigurer {
         return null;
     }
 
-    private String illegalRequestException(Exception exception){
+    private String illegalRequestException(Exception exception) {
         // 请求的非法json
-        if(exception instanceof HttpMessageNotReadableException mie){
+        if (exception instanceof HttpMessageNotReadableException mie) {
             return mie.getMessage();
         }
 
         return null;
+    }
+
+    // private final ServerProperties serverProperties;
+    protected HttpStatus getStatus(HttpServletRequest request) {
+        Integer statusCode = (Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        if (statusCode == null) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        try {
+            return HttpStatus.valueOf(statusCode);
+        } catch (Exception ex) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
+
+    // 默认错误页面
+    @RequestMapping("${server.error.path:${error.path:/error}}")
+    public ResponseResult<Void> errorJson(HttpServletRequest request) {
+        HttpStatus status = this.getStatus(request);
+
+        return ResponseResult.failure(status.value() + " " + status.getReasonPhrase());
     }
 
 }

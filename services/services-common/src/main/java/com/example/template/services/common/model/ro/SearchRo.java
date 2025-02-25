@@ -1,6 +1,6 @@
 package com.example.template.services.common.model.ro;
 
-import com.example.template.services.common.request.PageCondition;
+import com.example.template.services.common.common.request.PageCondition;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

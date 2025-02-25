@@ -1,8 +1,8 @@
 ### springboot 2.x的大型项目脚手架
 * JDK17
-* springBoot 2.7.18
+* SpringBoot 2.7.18
 * xbatis
-* Tucache
+* tucache
 * SpringDoc(OpenAPI3)
 * redisson
 * knife4j

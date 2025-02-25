@@ -1,7 +1,6 @@
-package com.example.template.services.common.response;
+package com.example.template.services.common.common.response;
 
 import cn.xbatis.core.mybatis.mapper.context.Pager;
-import com.github.pagehelper.PageInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -28,7 +27,8 @@ public class Paging<T> {
     @Schema(name = "data", description = "数据集合")
     private Collection<T> data = new ArrayList<>();
 
-    public Paging(){}
+    public Paging() {
+    }
 
     /**
      * @param pageIndex 页标,从1开始
@@ -39,22 +39,12 @@ public class Paging<T> {
         this.pageSize = pageSize;
     }
 
-    public Paging(PageInfo<T> phPage) {
-        this.pageIndex = phPage.getPageNum();
-        this.pageSize = phPage.getPageSize();
-        this.totalCount = phPage.getTotal();
-        this.pageCount = phPage.getPages();
-        if (phPage.getList() != null) {
-            this.data = phPage.getList();
-        }
-    }
-
     public void setTotalCount(long totalCount) {
         this.totalCount = totalCount;
         this.pageCount = (int) (totalCount / pageSize) + (totalCount % pageSize == 0 ? 0 : 1);
     }
 
-    public static <T> Paging<T> of(Pager<T> mpPage){
+    public static <T> Paging<T> of(Pager<T> mpPage) {
         return new Paging<>(mpPage);
     }
 

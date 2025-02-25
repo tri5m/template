@@ -1,6 +1,6 @@
 package com.example.template.services.common.configuration;
 
-import com.example.template.services.common.response.ResponseResult;
+import com.example.template.services.common.common.response.ResponseResult;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
