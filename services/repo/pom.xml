@@ -37,7 +37,7 @@
             <plugin>
                 <groupId>cn.xbatis</groupId>
                 <artifactId>xbatis-generator-maven-plugin</artifactId>
-                <version>1.1.1</version>
+                <version>1.1.2</version>
                 <configuration>
                     <configurationFile>${project.basedir}/src/main/resources/xbatis_generator.xml</configurationFile>
                 </configuration>

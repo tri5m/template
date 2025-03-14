@@ -24,7 +24,7 @@
         <redisson.version>3.23.2</redisson.version>
         <tucache.version>1.0.3.RELEASE</tucache.version>
         <knife4j.version>4.5.0</knife4j.version>
-        <xbatis.version>1.8.2</xbatis.version>
+        <xbatis.version>1.8.3</xbatis.version>
     </properties>
 
     <dependencyManagement>
