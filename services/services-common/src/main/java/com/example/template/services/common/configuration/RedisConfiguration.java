@@ -1,6 +1,5 @@
 package com.example.template.services.common.configuration;
 
-import cn.hutool.system.SystemUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -10,8 +9,7 @@ import org.redisson.Redisson;
 import org.redisson.api.NameMapper;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
-import org.redisson.config.Config;
-import org.redisson.config.TransportMode;
+import org.redisson.config.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -72,41 +70,93 @@ public class RedisConfiguration {
      */
     @Bean(destroyMethod = "shutdown")
     public RedissonClient redissonClient() {
+
+        String PROTOCOL = "redis://";
+
         Config config = new Config();
-        config.useSingleServer().setConnectionMinimumIdleSize(Runtime.getRuntime().availableProcessors());
-        config.setThreads(Runtime.getRuntime().availableProcessors());
-        config.setNettyThreads(Runtime.getRuntime().availableProcessors() + 1);
-        config.setCodec(new JsonJacksonCodec());
-
-        String pact = "redis";
-        String redisUrl = String.format("%s://%s:%s", pact, redisProperties.getHost(), redisProperties.getPort());
-        // 其他集群config.useReplicatedServers()...x
-
+        config.setCodec(new JsonJacksonCodec(createGenericObjectMapper()));
+        RedisProperties.Sentinel sentinel = redisProperties.getSentinel();
+        RedisProperties.Cluster redisPropertiesCluster = redisProperties.getCluster();
+        int threadCount = Math.max(Runtime.getRuntime().availableProcessors(), 4);
+        config.setThreads(threadCount);
+        config.setNettyThreads(threadCount + 1);
         TransportMode transportMode = TransportMode.NIO;
-        if (SystemUtil.getOsInfo().isLinux()) {
-            transportMode = TransportMode.EPOLL;
-        } else if (SystemUtil.getOsInfo().isMacOsX()) {
-            transportMode = TransportMode.KQUEUE;
+//        if (SystemUtil.getOsInfo().isLinux()) {
+//            transportMode = TransportMode.EPOLL;
+//        }
+//        if (SystemUtil.getOsInfo().isMacOsX()) {
+//            transportMode = TransportMode.KQUEUE;
+//        }
+        config.setTransportMode(transportMode);
+        if (redisPropertiesCluster != null) {
+            //集群redis
+            ClusterServersConfig clusterServersConfig = config.useClusterServers();
+            for (String cluster : redisPropertiesCluster.getNodes()) {
+                clusterServersConfig.addNodeAddress(PROTOCOL + cluster);
+            }
+            if (StringUtils.hasText(redisProperties.getPassword())) {
+                clusterServersConfig.setPassword(redisProperties.getPassword());
+            }
+            clusterServersConfig.setTimeout((int) redisProperties.getTimeout().toMillis());
+            clusterServersConfig.setPingConnectionInterval(30000);
+            clusterServersConfig.setNameMapper(new NameMapper() {
+                @Override
+                public String map(String name) {
+                    return appConfig.getCacheKeyPrefix() + name;
+                }
+
+                @Override
+                public String unmap(String name) {
+                    return name.substring(appConfig.getCacheKeyPrefix().length());
+                }
+            });
+        } else if (StringUtils.hasText(redisProperties.getHost())) {
+            //单点redis
+            SingleServerConfig singleServerConfig = config.useSingleServer().
+                    setAddress(PROTOCOL + redisProperties.getHost() + ":" + redisProperties.getPort());
+            if (StringUtils.hasText(redisProperties.getPassword())) {
+                singleServerConfig.setPassword(redisProperties.getPassword());
+            }
+            singleServerConfig.setTimeout((int) redisProperties.getTimeout().toMillis());
+            singleServerConfig.setPingConnectionInterval(30000);
+            singleServerConfig.setDatabase(redisProperties.getDatabase());
+            singleServerConfig.setNameMapper(new NameMapper() {
+                @Override
+                public String map(String name) {
+                    return appConfig.getCacheKeyPrefix() + name;
+                }
+
+                @Override
+                public String unmap(String name) {
+                    return name.substring(appConfig.getCacheKeyPrefix().length());
+                }
+            });
+        } else if (sentinel != null) {
+            //哨兵模式
+            SentinelServersConfig sentinelServersConfig = config.useSentinelServers();
+            sentinelServersConfig.setMasterName(sentinel.getMaster());
+            for (String node : sentinel.getNodes()) {
+                sentinelServersConfig.addSentinelAddress(PROTOCOL + node);
+            }
+            if (StringUtils.hasText(redisProperties.getPassword())) {
+                sentinelServersConfig.setPassword(redisProperties.getPassword());
+            }
+            sentinelServersConfig.setTimeout((int) redisProperties.getTimeout().toMillis());
+            sentinelServersConfig.setPingConnectionInterval(30000);
+            sentinelServersConfig.setDatabase(redisProperties.getDatabase());
+            sentinelServersConfig.setNameMapper(new NameMapper() {
+                @Override
+                public String map(String name) {
+                    return appConfig.getCacheKeyPrefix() + name;
+                }
+
+                @Override
+                public String unmap(String name) {
+                    return name.substring(appConfig.getCacheKeyPrefix().length());
+                }
+            });
         }
-        config.setTransportMode(transportMode)
-                .useSingleServer()
-                .setAddress(redisUrl)
-                .setPassword(redisProperties.getPassword())
-                .setDatabase(redisProperties.getDatabase())
-                .setNameMapper(new NameMapper() {
-                    @Override
-                    public String map(String name) {
-                        return appConfig.getCacheKeyPrefix() + name;
-                    }
-
-                    @Override
-                    public String unmap(String name) {
-                        return name.substring(appConfig.getCacheKeyPrefix().length());
-                    }
-                });
-
-        config.setLockWatchdogTimeout(60 * 100);
-
+        config.setLockWatchdogTimeout(6_000);
         return Redisson.create(config);
     }
 
