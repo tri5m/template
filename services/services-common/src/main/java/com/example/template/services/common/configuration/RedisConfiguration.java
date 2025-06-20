@@ -71,12 +71,19 @@ public class RedisConfiguration {
     @Bean(destroyMethod = "shutdown")
     public RedissonClient redissonClient() {
 
+
         String PROTOCOL = "redis://";
 
         Config config = new Config();
+
         config.setCodec(new JsonJacksonCodec(createGenericObjectMapper()));
         RedisProperties.Sentinel sentinel = redisProperties.getSentinel();
         RedisProperties.Cluster redisPropertiesCluster = redisProperties.getCluster();
+
+        Long timeout = redisProperties.getTimeout() == null ? null : redisProperties.getTimeout().toMillis();
+        Long connectTimeout = redisProperties.getConnectTimeout() == null ? null
+                : redisProperties.getConnectTimeout().toMillis();
+
         int threadCount = Math.max(Runtime.getRuntime().availableProcessors(), 4);
         config.setThreads(threadCount);
         config.setNettyThreads(threadCount + 1);
@@ -91,6 +98,12 @@ public class RedisConfiguration {
         if (redisPropertiesCluster != null) {
             //集群redis
             ClusterServersConfig clusterServersConfig = config.useClusterServers();
+            if (timeout != null) {
+                clusterServersConfig.setTimeout(Math.toIntExact(timeout));
+            }
+            if (connectTimeout != null) {
+                clusterServersConfig.setConnectTimeout(Math.toIntExact(connectTimeout));
+            }
             for (String cluster : redisPropertiesCluster.getNodes()) {
                 clusterServersConfig.addNodeAddress(PROTOCOL + cluster);
             }
@@ -114,6 +127,12 @@ public class RedisConfiguration {
             //单点redis
             SingleServerConfig singleServerConfig = config.useSingleServer().
                     setAddress(PROTOCOL + redisProperties.getHost() + ":" + redisProperties.getPort());
+            if (timeout != null) {
+                singleServerConfig.setTimeout(Math.toIntExact(timeout));
+            }
+            if (connectTimeout != null) {
+                singleServerConfig.setConnectTimeout(Math.toIntExact(connectTimeout));
+            }
             if (StringUtils.hasText(redisProperties.getPassword())) {
                 singleServerConfig.setPassword(redisProperties.getPassword());
             }
@@ -141,7 +160,12 @@ public class RedisConfiguration {
             if (StringUtils.hasText(redisProperties.getPassword())) {
                 sentinelServersConfig.setPassword(redisProperties.getPassword());
             }
-            sentinelServersConfig.setTimeout((int) redisProperties.getTimeout().toMillis());
+            if (timeout != null) {
+                sentinelServersConfig.setTimeout(Math.toIntExact(timeout));
+            }
+            if (connectTimeout != null) {
+                sentinelServersConfig.setConnectTimeout(Math.toIntExact(connectTimeout));
+            }
             sentinelServersConfig.setPingConnectionInterval(30000);
             sentinelServersConfig.setDatabase(redisProperties.getDatabase());
             sentinelServersConfig.setNameMapper(new NameMapper() {
