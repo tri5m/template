@@ -14,8 +14,8 @@ RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' 
 WORKDIR /app
 
 COPY services/template-service/target/template-service.jar /app/app.jar
-
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:InitialRAMPercentage=70.0", \
-"-XX:MaxRAMPercentage=70.0", "-jar", "app.jar"]
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:InitialRAMPercentage=50.0 -XX:MaxRAMPercentage=80.0"
+#CMD java -jar /app/app.jar
+ENTRYPOINT ["java", "${JAVA_OPTS}", "-jar", "app.jar"]
 
 EXPOSE 8080
