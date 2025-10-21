@@ -70,8 +70,9 @@ public class RequestHolder {
         if (sra == null) {
             return null;
         }
-        List<String> head = Arrays.asList("X-Real-IP", "X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP",
-                "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR");
+        List<String> head = Arrays.asList("X-Real-IP", "X-Original-Forwarded-For", "X-Forwarded-For",
+                "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR", "HTTP_X_FORWARDED",
+                "HTTP_X_CLUSTER_CLIENT_IP", "HTTP_FORWARDED_FOR", "HTTP_FORWARDED", "HTTP_VIA", "REMOTE_ADDR");
         for (String h : head) {
             String ip = sra.getRequest().getHeader(h);
             if (!StrUtil.isBlank(ip) && !unknown.equalsIgnoreCase(ip)) {
