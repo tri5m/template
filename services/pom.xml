@@ -21,7 +21,7 @@
 
     <properties>
         <spring.boot.version>2.7.18</spring.boot.version>
-        <redisson.version>3.23.2</redisson.version>
+        <redisson.version>3.45.1</redisson.version>
         <tucache.version>1.0.3.RELEASE</tucache.version>
         <knife4j.version>4.5.0</knife4j.version>
         <xbatis.version>1.8.3</xbatis.version>
@@ -44,7 +44,7 @@
                 <version>${redisson.version}</version>
                 <exclusions>
                     <exclusion>
-                        <artifactId>redisson-spring-data-31</artifactId>
+                        <artifactId>redisson-spring-data-34</artifactId>
                         <groupId>org.redisson</groupId>
                     </exclusion>
                 </exclusions>
