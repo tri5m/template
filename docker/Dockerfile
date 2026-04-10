@@ -15,7 +15,6 @@ WORKDIR /app
 
 COPY services/template-service/target/template-service.jar /app/app.jar
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:InitialRAMPercentage=50.0 -XX:MaxRAMPercentage=80.0"
-#CMD java -jar /app/app.jar
 ENTRYPOINT ["java", "${JAVA_OPTS}", "-jar", "app.jar"]
-
+CMD ["--spring.profiles.active=dev"]
 EXPOSE 8080
