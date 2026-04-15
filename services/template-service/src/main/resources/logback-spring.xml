@@ -24,16 +24,7 @@
     </appender>
 
     <!--开发环境:打印控制台-->
-    <springProfile name="dev">
-        <logger name="${project.groupId}" level="DEBUG"/>
-        <logger name="cn.xbatis" level="DEBUG"/>
-        <root level="INFO">
-            <appender-ref ref="FILE"/>
-            <appender-ref ref="CONSOLE"/>
-        </root>
-    </springProfile>
-
-    <springProfile name="test">
+    <springProfile name="dev,test">
         <logger name="${project.groupId}" level="DEBUG"/>
         <logger name="cn.xbatis" level="DEBUG"/>
         <root level="INFO">
