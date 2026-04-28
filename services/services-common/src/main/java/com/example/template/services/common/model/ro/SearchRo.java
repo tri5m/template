@@ -15,7 +15,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @Schema(name = "SearchRo", description = "分页+关键字搜索")
 public class SearchRo extends PageCondition {
-
     @Schema(description = "关键词", type = "string", nullable = true)
     private String keyword;
 }

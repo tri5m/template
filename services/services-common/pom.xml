@@ -71,7 +71,7 @@
         </dependency>
 
         <dependency>
-            <groupId>co.tunan.tucache</groupId>
+            <groupId>io.github.tri5m</groupId>
             <artifactId>tucache-spring-boot-starter</artifactId>
         </dependency>
 

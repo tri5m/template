@@ -1,14 +1,14 @@
 package com.example.template.service.template.service;
 
 import cn.xbatis.core.sql.executor.chain.QueryChain;
-import co.tunan.tucache.core.annotation.TuCache;
-import co.tunan.tucache.core.annotation.TuCacheClear;
 import com.example.template.common.helper.BeanFiller;
 import com.example.template.repo.entity.Admin;
 import com.example.template.repo.mapper.AdminMapper;
 import com.example.template.service.template.model.vo.AdminBaseVo;
 import com.example.template.services.common.common.response.Paging;
 import com.example.template.services.common.model.ro.SearchRo;
+import io.github.tri5m.tucache.core.annotation.TuCache;
+import io.github.tri5m.tucache.core.annotation.TuCacheClear;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +55,7 @@ public class TestService {
         return BeanFiller.target(AdminBaseVo.class).accept(admin);
     }
 
-    @TuCache(key = "admin:admin_list:cache:#{#ro.pageIndex}_#{#ro.pageSize}:#{#ro.keyword}", expire = 60)
+    @TuCache(key = "admin:admin_list:cache:#{#ro.pageIndex}_#{#ro.pageSize}:#{#ro.keyword}", timeout = 60)
     public Paging<AdminBaseVo> adminListHasCache(SearchRo ro) {
 
         return Paging.of(QueryChain.of(adminMapper)
